@@ -11,7 +11,6 @@ import com.cognizant.employeetraveldesk.reimbursement.entity.ReimbursementReques
 import com.cognizant.employeetraveldesk.reimbursement.exception.DuplicateResourceException;
 import com.cognizant.employeetraveldesk.reimbursement.exception.ResourceNotFoundException;
 import com.cognizant.employeetraveldesk.reimbursement.model.ReimbursementRequestsDTO;
-import com.cognizant.employeetraveldesk.reimbursement.model.ReimbursementTypesDTO;
 import com.cognizant.employeetraveldesk.reimbursement.repository.ReimbursementRequestsRepository;
 import com.cognizant.employeetraveldesk.reimbursement.service.ReimbursementRequestsService;
 

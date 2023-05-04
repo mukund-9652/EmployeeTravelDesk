@@ -38,7 +38,7 @@ public class ReimbursementTypes {
 		super();
 	}
 
-	ReimbursementTypes(int id, String type) {
+	public ReimbursementTypes(int id, String type) {
 		this.id = id;
 		this.type = type;
 	}

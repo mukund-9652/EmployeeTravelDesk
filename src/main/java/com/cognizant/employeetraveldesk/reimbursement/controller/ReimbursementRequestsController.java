@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.employeetraveldesk.reimbursement.model.ReimbursementRequestsDTO;
-import com.cognizant.employeetraveldesk.reimbursement.model.ReimbursementTypesDTO;
 import com.cognizant.employeetraveldesk.reimbursement.service.implementation.ReimbursementRequestsServiceImpl;
-import com.cognizant.employeetraveldesk.reimbursement.service.implementation.ReimbursementTypesServiceImpl;
 
 @Validated
 @RestController
@@ -27,14 +25,6 @@ import com.cognizant.employeetraveldesk.reimbursement.service.implementation.Rei
 public class ReimbursementRequestsController {
 	@Autowired
 	ReimbursementRequestsServiceImpl reimbursementRequestsServiceImpl;
-	@Autowired
-	ReimbursementTypesServiceImpl reimbursementTypesServiceImpl;
-
-	@GetMapping("/types")
-	public List<ReimbursementTypesDTO> getReimbursementTypes() {
-		// This Returns a list of ReimbursementTypes
-		return reimbursementTypesServiceImpl.readAllTypes();
-	}
 
 	@GetMapping("/{travelrequestid}/requests")
 	public List<ReimbursementRequestsDTO> getReimbursementRequests(@PathVariable Integer travelrequestid) {
