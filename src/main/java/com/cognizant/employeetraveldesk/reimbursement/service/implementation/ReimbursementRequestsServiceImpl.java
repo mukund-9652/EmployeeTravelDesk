@@ -13,6 +13,7 @@ import com.cognizant.employeetraveldesk.reimbursement.exception.ResourceNotFound
 import com.cognizant.employeetraveldesk.reimbursement.model.ReimbursementRequestsDTO;
 import com.cognizant.employeetraveldesk.reimbursement.repository.ReimbursementRequestsRepository;
 import com.cognizant.employeetraveldesk.reimbursement.service.ReimbursementRequestsService;
+import com.cognizant.employeetraveldesk.reimbursement.service.mapper.EntityDTOMapper;
 
 @Service
 public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsService {
@@ -20,24 +21,7 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 	@Autowired
 	ReimbursementRequestsRepository reimbursementRequestsRepository;
 
-	public ReimbursementRequests mapDTOToEntity(ReimbursementRequestsDTO requestsDTO) {
-		ReimbursementRequests reimbursementRequests = new ReimbursementRequests(requestsDTO.getId(),
-				requestsDTO.getTravelRequestId(), requestsDTO.getRequestRaisedByEmployeeId(),
-				requestsDTO.getRequestDate(), requestsDTO.getReimbursementTypes(), requestsDTO.getInvoiceNo(),
-				requestsDTO.getInvoiceDate(), requestsDTO.getInvoiceAmount(), requestsDTO.getDocumentURL(),
-				requestsDTO.getRequestProcessedOn(), requestsDTO.getRequestProcessedByEmployeeId(),
-				requestsDTO.getStatus(), requestsDTO.getRemarks());
-		return reimbursementRequests;
-	}
-
-	public ReimbursementRequestsDTO mapEntityToDTO(ReimbursementRequests requests) {
-		ReimbursementRequestsDTO reimbursementRequestsDTO = new ReimbursementRequestsDTO(requests.getId(),
-				requests.getTravelRequestId(), requests.getRequestRaisedByEmployeeId(), requests.getRequestDate(),
-				requests.getReimbursementTypes(), requests.getInvoiceNo(), requests.getInvoiceDate(),
-				requests.getInvoiceAmount(), requests.getDocumentURL(), requests.getRequestProcessedOn(),
-				requests.getRequestProcessedByEmployeeId(), requests.getStatus(), requests.getRemarks());
-		return reimbursementRequestsDTO;
-	}
+	private EntityDTOMapper entityDTOMapper=new EntityDTOMapper();
 
 	@Override
 	public boolean createRequest(ReimbursementRequestsDTO requestDTO)
@@ -45,7 +29,7 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 		// TODO Auto-generated method stub
 
 		Optional<ReimbursementRequests> result;
-		ReimbursementRequests reimbursementRequests = mapDTOToEntity(requestDTO);
+		ReimbursementRequests reimbursementRequests = entityDTOMapper.mapDTOToEntity(requestDTO);
 		result = reimbursementRequestsRepository.findById(reimbursementRequests.getId());
 
 		if (result.isPresent()) {
@@ -71,7 +55,7 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 		}
 
 		for (ReimbursementRequests requests : reimbursementRequestsEntity) {
-			ReimbursementRequestsDTO requestDTO = mapEntityToDTO(requests);
+			ReimbursementRequestsDTO requestDTO = entityDTOMapper.mapEntityToDTO(requests);
 			reimbursementRequestsDTO.add(requestDTO);
 		}
 
@@ -89,7 +73,7 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 
 		if (result.isPresent()) {
 			resultEntity = result.get();
-			resultDTO = mapEntityToDTO(resultEntity);
+			resultDTO = entityDTOMapper.mapEntityToDTO(resultEntity);
 			return resultDTO;
 		} else {
 			throw new ResourceNotFoundException("Request for Id " + id + " was not found");
@@ -100,7 +84,7 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 	public boolean updateRequest(ReimbursementRequestsDTO requestDTO) throws ResourceNotFoundException {
 		// TODO Auto-generated method stub
 
-		ReimbursementRequests request = mapDTOToEntity(requestDTO);
+		ReimbursementRequests request = entityDTOMapper.mapDTOToEntity(requestDTO);
 
 		Optional<ReimbursementRequests> result = reimbursementRequestsRepository.findById(request.getId());
 		if (result.isPresent()) {

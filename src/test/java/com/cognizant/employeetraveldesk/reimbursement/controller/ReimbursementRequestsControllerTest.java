@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.cognizant.employeetraveldesk.reimbursement.entity.ReimbursementTypes;
 import com.cognizant.employeetraveldesk.reimbursement.model.ReimbursementRequestsDTO;
 import com.cognizant.employeetraveldesk.reimbursement.service.implementation.ReimbursementRequestsServiceImpl;
+import com.cognizant.employeetraveldesk.reimbursement.service.mapper.EntityDTOMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
@@ -33,6 +34,8 @@ class ReimbursementRequestsControllerTest {
 
 	@MockBean
 	private ReimbursementRequestsServiceImpl reimbursementRequestsServicesImpl;
+
+	private EntityDTOMapper entityDTOMapper = new EntityDTOMapper();
 
 	private LocalDate currentDate = LocalDate.now();
 	
@@ -49,14 +52,13 @@ class ReimbursementRequestsControllerTest {
 	private List<ReimbursementRequestsDTO> requests = new ArrayList<ReimbursementRequestsDTO>(Arrays.asList(requestDTO_1,requestDTO_2,requestDTO_3));
 
 	@Test
-	public void getRequestsForTravelRequestId_success() throws Exception {
+	public void getRequestsForTravelRequestIdSuccess() throws Exception {
 			int travelRequestId = requestDTO_1.getTravelRequestId();
 			
 			when(reimbursementRequestsServicesImpl.readAllRequestsForTravelRequestId(travelRequestId)).thenReturn(requests);
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
 					.get("http://localhost:8084/api/reimbursements/"+travelRequestId+"/requests")
 					.accept(MediaType.APPLICATION_JSON)).andReturn();
-			System.out.println(mvcResult.getResponse().getContentAsString());
-		
+			System.out.println(mvcResult.getResponse().getContentAsString()); 
 	}
 }
