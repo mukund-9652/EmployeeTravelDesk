@@ -2,6 +2,7 @@ package com.cognizant.employeetraveldesk.reimbursement.exception;
 
 import java.util.Date;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.GenericJDBCException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,13 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<?> handleAPIException(APIException exception, WebRequest request) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
 		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+	}
+	
+	//handle constraints exception
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException exception, WebRequest request) {
+		return null;
+		
 	}
 
 	// handle Resource not found exception
@@ -45,8 +53,15 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	//handle Invalid Resource Exception
+	@ExceptionHandler(InvalidResourceException.class)
+	public ResponseEntity<?> handleInvalidResourceException(InvalidResourceException exception,
+			WebRequest request) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), "Invalid Resource Error", exception.getMessage());
+		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_ACCEPTABLE);
+	}
+	
 	// handle Validation Exceptions
-
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<?> customValidationException(MethodArgumentNotValidException exception) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), "Validation Error",
@@ -55,7 +70,6 @@ public class GlobalExceptionHandler {
 	}
 
 	// To handle JDBC Exceptions
-
 	@ExceptionHandler(GenericJDBCException.class)
 	public ResponseEntity<String> handleGenericJDBCException(GenericJDBCException ex) {
 		Throwable rootCause = ex.getSQLException();

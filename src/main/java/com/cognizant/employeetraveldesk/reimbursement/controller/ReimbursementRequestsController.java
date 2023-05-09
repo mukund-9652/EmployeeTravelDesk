@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.employeetraveldesk.reimbursement.exception.DuplicateResourceException;
+import com.cognizant.employeetraveldesk.reimbursement.exception.InvalidResourceException;
+import com.cognizant.employeetraveldesk.reimbursement.exception.ResourceNotFoundException;
 import com.cognizant.employeetraveldesk.reimbursement.model.ReimbursementRequestsDTO;
 import com.cognizant.employeetraveldesk.reimbursement.service.implementation.ReimbursementRequestsServiceImpl;
 
@@ -28,18 +31,19 @@ public class ReimbursementRequestsController {
 
 	@GetMapping("/{travelrequestid}/requests")
 	public List<ReimbursementRequestsDTO> getReimbursementRequests(@PathVariable Integer travelrequestid) {
-		// This Returns the list of reimbursement requests DTO for the requested travel id
+		// This Returns the list of reimbursement requests DTO for the requested travel
+		// id
 		return reimbursementRequestsServiceImpl.readAllRequestsForTravelRequestId(travelrequestid);
 	}
 
 	@GetMapping("/{reimbursementid}")
 	public ReimbursementRequestsDTO getReimbursement(@PathVariable Integer reimbursementid) {
 		// This Returns the reimbursement request DTO for the given reimbursement id
-		return reimbursementRequestsServiceImpl.read(reimbursementid);
+		return reimbursementRequestsServiceImpl.readRequest(reimbursementid);
 	}
 
 	@PostMapping("/add")
-	public ResponseEntity<Void> createReimbursement(@Valid @RequestBody ReimbursementRequestsDTO request) {
+	public ResponseEntity<Void> createReimbursement(@Valid @RequestBody ReimbursementRequestsDTO request) throws DuplicateResourceException, ResourceNotFoundException, InvalidResourceException {
 		// This returns the status code if the reimbursement request is created or not
 		boolean requestStatusCheck = reimbursementRequestsServiceImpl.createRequest(request);
 		if (requestStatusCheck) {

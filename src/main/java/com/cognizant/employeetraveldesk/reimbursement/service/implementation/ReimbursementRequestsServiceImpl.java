@@ -1,5 +1,8 @@
 package com.cognizant.employeetraveldesk.reimbursement.service.implementation;
 
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.cognizant.employeetraveldesk.reimbursement.entity.ReimbursementRequests;
 import com.cognizant.employeetraveldesk.reimbursement.exception.DuplicateResourceException;
+import com.cognizant.employeetraveldesk.reimbursement.exception.InvalidResourceException;
 import com.cognizant.employeetraveldesk.reimbursement.exception.ResourceNotFoundException;
 import com.cognizant.employeetraveldesk.reimbursement.model.ReimbursementRequestsDTO;
 import com.cognizant.employeetraveldesk.reimbursement.repository.ReimbursementRequestsRepository;
@@ -21,11 +25,11 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 	@Autowired
 	ReimbursementRequestsRepository reimbursementRequestsRepository;
 
-	private EntityDTOMapper entityDTOMapper=new EntityDTOMapper();
+	private EntityDTOMapper entityDTOMapper = new EntityDTOMapper();
 
 	@Override
 	public boolean createRequest(ReimbursementRequestsDTO requestDTO)
-			throws DuplicateResourceException, ResourceNotFoundException {
+			throws DuplicateResourceException, ResourceNotFoundException, InvalidResourceException {
 		// TODO Auto-generated method stub
 
 		Optional<ReimbursementRequests> result;
@@ -36,8 +40,17 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 			throw new DuplicateResourceException(
 					"Resource is already available for Id : " + reimbursementRequests.getId());
 		}
-		reimbursementRequestsRepository.save(reimbursementRequests);
-		return true;
+		
+		if(this.checkTravelPlannerDate(reimbursementRequests.getInvoiceDate())==false) {
+			throw new InvalidResourceException("Invalid Invoice Date: "+reimbursementRequests.getInvoiceDate());
+		}
+		if(this.checkInvoiceAmount(reimbursementRequests)) {
+			//throw new InvalidResourceException("Invalid Invoice Amount");
+			reimbursementRequestsRepository.save(reimbursementRequests);
+			return true;
+		}
+		
+		return false;
 
 	}
 
@@ -63,7 +76,7 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 	}
 
 	@Override
-	public ReimbursementRequestsDTO read(int id) throws ResourceNotFoundException {
+	public ReimbursementRequestsDTO readRequest(int id) throws ResourceNotFoundException {
 		// TODO Auto-generated method stub
 		ReimbursementRequests resultEntity;
 		ReimbursementRequestsDTO resultDTO;
@@ -89,8 +102,8 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 		Optional<ReimbursementRequests> result = reimbursementRequestsRepository.findById(request.getId());
 		if (result.isPresent()) {
 			String updatedStatus = request.getStatus(), currentStatus = result.get().getStatus();
-			if (currentStatus.equalsIgnoreCase(updatedStatus) && updatedStatus.equalsIgnoreCase("rejected")
-					&& request.getRemarks().isEmpty()) {
+			if (currentStatus.equalsIgnoreCase(updatedStatus) && request.getRemarks().isEmpty()) {
+				System.out.println("currentstatus equals updatedstatus");
 				return false;
 			}
 			reimbursementRequestsRepository.save(request);
@@ -98,6 +111,47 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 		} else {
 			throw new ResourceNotFoundException("Request for Id " + requestDTO.getId() + " was not found");
 		}
+	}
+
+	public boolean checkTravelPlannerDate(LocalDate inputDate) {
+		LocalDate startDate = LocalDate.of(2023, 01, 01);
+		LocalDate endDate = LocalDate.of(2024, 01, 01);
+
+		if (inputDate.isBefore(startDate) || inputDate.isAfter(endDate)) {
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean checkInvoiceAmount(ReimbursementRequests request) throws InvalidResourceException {
+		
+		
+		System.out.println("-------------------"+request.getReimbursementTypes().getType()+"----------------------");
+		
+		List<Object[]> invoicePerDayDetails = reimbursementRequestsRepository.getReimbursementRequestsByEmployeeIdAndType(request.getRequestRaisedByEmployeeId(),request.getReimbursementTypes().getType());
+		
+		System.out.println("Result:\n"+invoicePerDayDetails.size());
+		
+		for (Object[] result: invoicePerDayDetails) {
+			java.sql.Date sqlDate = (Date) result[1];
+			LocalDate invoiceDate = sqlDate.toLocalDate();
+            BigDecimal value=new BigDecimal(result[2].toString());
+            Double invoiceAmount=value.doubleValue();
+            String type=(String) result[3];
+            
+            System.out.println(invoiceDate+" "+" "+invoiceAmount+" "+type);
+            
+            if((type.equalsIgnoreCase("Food") || type.equalsIgnoreCase("Water")) && invoiceAmount+request.getInvoiceAmount()>1500) {
+            	throw new InvalidResourceException("Invalid amount for Food/Water. Your food limit per day is 1500. Your current invoice amount for food is Rs."+invoiceAmount+" for the date "+invoiceDate);
+            }
+            else if(type.equalsIgnoreCase("Laundry") && invoiceAmount+request.getInvoiceAmount()>500) {
+            	throw new InvalidResourceException("Invalid amount for Laundry. Your food limit per day is 500. Your current invoice amount for Laundry is Rs."+invoiceAmount+" for the date "+invoiceDate);
+            }
+            else if( type.equalsIgnoreCase("Local Travel") && invoiceAmount+request.getInvoiceAmount()>1000) {
+            	throw new InvalidResourceException("Invalid amount for Local Travel. Your Local Travel limit per day is 1000. Your current invoice amount for Local Travel is Rs."+invoiceAmount+" for the date "+invoiceDate);
+            }
+        }
+		return true;
 	}
 
 }

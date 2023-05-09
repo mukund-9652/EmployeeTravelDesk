@@ -184,4 +184,14 @@ public class ReimbursementRequestsDTO {
 		this.reimbursementTypes = reimbursementTypes;
 	}
 
+	@Override
+	public String toString() {
+		return "ReimbursementRequestsDTO [id=" + id + ", travelRequestId=" + travelRequestId
+				+ ", requestRaisedByEmployeeId=" + requestRaisedByEmployeeId + ", requestDate=" + requestDate
+				+ ", reimbursementTypes=" + reimbursementTypes + ", invoiceNo=" + invoiceNo + ", invoiceDate="
+				+ invoiceDate + ", invoiceAmount=" + invoiceAmount + ", documentURL=" + documentURL
+				+ ", requestProcessedOn=" + requestProcessedOn + ", requestProcessedByEmployeeId="
+				+ requestProcessedByEmployeeId + ", status=" + status + ", remarks=" + remarks + "]";
+	}
+
 }

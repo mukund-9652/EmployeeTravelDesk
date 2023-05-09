@@ -1,5 +1,8 @@
 package com.cognizant.employeetraveldesk.reimbursement.service.mapper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.cognizant.employeetraveldesk.reimbursement.entity.ReimbursementRequests;
 import com.cognizant.employeetraveldesk.reimbursement.model.ReimbursementRequestsDTO;
 
@@ -21,5 +24,21 @@ public class EntityDTOMapper {
 				requests.getInvoiceAmount(), requests.getDocumentURL(), requests.getRequestProcessedOn(),
 				requests.getRequestProcessedByEmployeeId(), requests.getStatus(), requests.getRemarks());
 		return reimbursementRequestsDTO;
+	}
+
+	public List<ReimbursementRequests> mapDTOToEntity(List<ReimbursementRequestsDTO> requestsDTO) {
+		List<ReimbursementRequests> result = new ArrayList<>();
+		for (ReimbursementRequestsDTO request : requestsDTO) {
+			result.add(this.mapDTOToEntity(request));
+		}
+		return result;
+	}
+
+	public List<ReimbursementRequestsDTO> mapEntityToDTO(List<ReimbursementRequests> requests) {
+		List<ReimbursementRequestsDTO> result = new ArrayList<>();
+		for (ReimbursementRequests requestDTO : requests) {
+			result.add(this.mapEntityToDTO(requestDTO));
+		}
+		return result;
 	}
 }
