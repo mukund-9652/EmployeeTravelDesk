@@ -53,16 +53,16 @@ class ReimbursementRequestsServiceImplTest {
 	public void setUp() {
 		MockitoAnnotations.openMocks(this);
 	}
-	
+
 	/*
 	 * Testing Methods for Success Outputs
 	 */
-	
-	
+
 	/*
-	 *  TEST - 1 : Testing the createRequest method for ReimbursementRequestService - SUCCESS
+	 * TEST - 1 : Testing the createRequest method for ReimbursementRequestService -
+	 * SUCCESS
 	 */
-	
+
 	@Test
 	public void creatingRequestsSuccessTest() throws DuplicateResourceException, InvalidResourceException {
 		ReimbursementRequestsDTO reimbursementRequestDTO = new ReimbursementRequestsDTO(100, 1234567, 9876543,
@@ -79,21 +79,26 @@ class ReimbursementRequestsServiceImplTest {
 		assertTrue(createRequest);
 	}
 
-	
-
 	/*
-	 *  TEST - 2 : Testing the readAllRequestsForTravelRequestId method for ReimbursementRequestService - SUCCESS
+	 * TEST - 2 : Testing the readAllRequestsForTravelRequestId method for
+	 * ReimbursementRequestService - SUCCESS
 	 */
-	
+
 	@Test
 	public void readAllRequestsForTravelRequestIdTest() {
 		List<ReimbursementRequestsDTO> requestListTestDTO = new ArrayList<>(Arrays.asList(
 				(new ReimbursementRequestsDTO(100, 1234567, 9876543, currentDate, new ReimbursementTypes(1, "Food"),
-						"1928374", LocalDate.of(2023, 1, 21), 1500, "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", null, null, "New", "")),
+						"1928374", LocalDate.of(2023, 1, 21), 1500,
+						"https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", null, null, "New",
+						"")),
 				new ReimbursementRequestsDTO(101, 1234567, 9876543, currentDate, new ReimbursementTypes(2, "Water"),
-						"1928398", LocalDate.of(2023, 1, 22), 1650, "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", null, null, "New", ""),
+						"1928398", LocalDate.of(2023, 1, 22), 1650,
+						"https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", null, null, "New",
+						""),
 				new ReimbursementRequestsDTO(102, 1234567, 9876543, currentDate, new ReimbursementTypes(3, "Laundry"),
-						"1925678", LocalDate.of(2023, 1, 22), 1050, "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", null, null, "New", "")));
+						"1925678", LocalDate.of(2023, 1, 22), 1050,
+						"https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", null, null, "New",
+						"")));
 
 		when(reimbursementRequestsRepository.findByTravelRequestId(1234567))
 				.thenReturn(entityDTOMapper.mapDTOToEntity(requestListTestDTO));
@@ -107,9 +112,10 @@ class ReimbursementRequestsServiceImplTest {
 
 		assertEquals(requestListTestDTO.get(2).toString(), actualListDTO.get(2).toString());
 	}
-	
+
 	/*
-	 *  TEST - 3 : Testing the readRequestByEmployeeId method for ReimbursementRequestService - SUCCESS
+	 * TEST - 3 : Testing the readRequestByEmployeeId method for
+	 * ReimbursementRequestService - SUCCESS
 	 */
 
 	@Test
@@ -129,9 +135,10 @@ class ReimbursementRequestsServiceImplTest {
 
 		assertEquals(reimbursementRequest.get().toString(), findRequest.toString());
 	}
-	
+
 	/*
-	 *  TEST - 4 : Testing the updateRequest method for ReimbursementRequestService - SUCCESS
+	 * TEST - 4 : Testing the updateRequest method for ReimbursementRequestService -
+	 * SUCCESS
 	 */
 
 	@Test
@@ -164,10 +171,10 @@ class ReimbursementRequestsServiceImplTest {
 	/*
 	 * Testing for Negative Cases that throws exceptions
 	 */
-	
-	
+
 	/*
-	 *  TEST - 1 : Testing the createRequest method for ReimbursementRequestService - Fail due to Duplicate entry
+	 * TEST - 1 : Testing the createRequest method for ReimbursementRequestService -
+	 * Fail due to Duplicate entry
 	 */
 
 	@Test
@@ -184,9 +191,10 @@ class ReimbursementRequestsServiceImplTest {
 		});
 
 	}
-	
+
 	/*
-	 *  TEST - 2 : Testing the createRequest method for ReimbursementRequestService - Fail due to Invalid Resource : Invalid Invoice Date
+	 * TEST - 2 : Testing the createRequest method for ReimbursementRequestService -
+	 * Fail due to Invalid Resource : Invalid Invoice Date
 	 */
 
 	@Test
@@ -200,10 +208,10 @@ class ReimbursementRequestsServiceImplTest {
 		assertThrows(InvalidResourceException.class,
 				() -> reimbursementRequestsServiceImpl.createRequest(reimbursementRequestDTO));
 	}
-	
-	
+
 	/*
-	 *  TEST - 3 : Testing the createRequest method for ReimbursementRequestService - Fail due to Invalid Resource : Invalid Invoice Amount
+	 * TEST - 3 : Testing the createRequest method for ReimbursementRequestService -
+	 * Fail due to Invalid Resource : Invalid Invoice Amount
 	 */
 
 	@Test
@@ -216,9 +224,10 @@ class ReimbursementRequestsServiceImplTest {
 		assertThrows(InvalidResourceException.class,
 				() -> reimbursementRequestsServiceImpl.createRequest(reimbursementRequestDTO));
 	}
-	
+
 	/*
-	 *  TEST - 4 : Testing the createRequest method for ReimbursementRequestService - Fail due to Invalid Resource : Invalid Invoice Amount
+	 * TEST - 4 : Testing the createRequest method for ReimbursementRequestService -
+	 * Fail due to Invalid Resource : Invalid Invoice Amount
 	 */
 
 	@Test
@@ -231,9 +240,10 @@ class ReimbursementRequestsServiceImplTest {
 		assertThrows(InvalidResourceException.class,
 				() -> reimbursementRequestsServiceImpl.createRequest(reimbursementRequestDTO));
 	}
-	
+
 	/*
-	 *  TEST - 5 : Testing the readRequest method for ReimbursementRequestService - Fail due to Resource Not Found
+	 * TEST - 5 : Testing the readRequest method for ReimbursementRequestService -
+	 * Fail due to Resource Not Found
 	 */
 
 	@Test
@@ -243,9 +253,10 @@ class ReimbursementRequestsServiceImplTest {
 		
 		assertThrows(ResourceNotFoundException.class,() -> reimbursementRequestsServiceImpl.readRequestByReimbursementId(100));
 	}
-	
+
 	/*
-	 *  TEST - 6 : Testing the readAllRequestsForTravelRequestId method for ReimbursementRequestService - Fail due to Resource Not Found
+	 * TEST - 6 : Testing the readAllRequestsForTravelRequestId method for
+	 * ReimbursementRequestService - Fail due to Resource Not Found
 	 */
 
 	@Test
@@ -256,5 +267,20 @@ class ReimbursementRequestsServiceImplTest {
 		assertThrows(ResourceNotFoundException.class,() -> reimbursementRequestsServiceImpl.readAllRequestsForTravelRequestId(100));
 	}
 	
-	
+	/*
+	 * TEST - 4 : Testing the createRequest method for ReimbursementRequestService -
+	 * Fail due to Invalid Resource : Invalid Invoice Amount
+	 */
+
+	@Test
+	public void createRequestTestFail_ValidationException_StatusType() throws InvalidResourceException {
+		ReimbursementRequestsDTO reimbursementRequestDTO = new ReimbursementRequestsDTO(100, 1234567, 9876543,
+				currentDate, new ReimbursementTypes(1, "Food"), "1928374", LocalDate.of(2023, 1, 21), 1200,
+				"https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", null, null, "Reject", "");
+
+		when(reimbursementRequestsRepository.save(any())).thenThrow(InvalidResourceException.class);
+		assertThrows(InvalidResourceException.class,
+				() -> reimbursementRequestsServiceImpl.createRequest(reimbursementRequestDTO));
+	}
+
 }

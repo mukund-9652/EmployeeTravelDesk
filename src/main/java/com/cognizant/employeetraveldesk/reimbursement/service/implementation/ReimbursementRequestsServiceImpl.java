@@ -99,7 +99,7 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 	}
 
 	@Override
-	public boolean updateRequest(ReimbursementRequestsDTO requestDTO) throws ResourceNotFoundException {
+	public boolean updateRequest(ReimbursementRequestsDTO requestDTO) throws ResourceNotFoundException,InvalidResourceException {
 		// TODO Auto-generated method stub
 
 		ReimbursementRequests request = entityDTOMapper.mapDTOToEntity(requestDTO);
@@ -107,9 +107,12 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 		Optional<ReimbursementRequests> result = reimbursementRequestsRepository.findById(request.getId());
 		if (result.isPresent()) {
 			String updatedStatus = request.getStatus(), currentStatus = result.get().getStatus();
-			if (currentStatus.equalsIgnoreCase(updatedStatus) && request.getRemarks().isEmpty()) {
-				System.out.println("currentstatus equals updatedstatus");
-				return false;
+			if (currentStatus.equalsIgnoreCase(updatedStatus)) {
+				throw new InvalidResourceException("You should only update the status and not any other values.");
+			} 
+			
+			if(request.getStatus().equalsIgnoreCase("Rejected") && request.getRemarks().isEmpty()) {
+				throw new InvalidResourceException("Remaks cannot be Empty when the request is rejected.");
 			}
 			LocalDate updatedDate=LocalDate.now();
 			request.setRequestProcessedOn(updatedDate);
@@ -120,6 +123,10 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 		}
 	}
 
+	/*
+	 * This function is to check invoice date is with in the from and to date of the travel
+	 */
+	
 	public boolean checkTravelPlannerDate(LocalDate inputDate) {
 		LocalDate startDate = LocalDate.of(2023, 01, 01);
 		LocalDate endDate = LocalDate.of(2024, 01, 01);
@@ -129,6 +136,13 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 		}
 		return true;
 	}
+	
+	/*
+	 * This function is to check and allow expense per day for food, laundry and local travel is as follows 
+	 * Food and water – upto 1500 per day 
+	 * Laundry – upto 500 per day
+	 * Local travel – upto 1000 per day 
+	 */
 
 	public boolean checkInvoiceAmount(ReimbursementRequests request) throws InvalidResourceException {
 
@@ -169,6 +183,10 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 		}
 	}
 
+	/*
+	 * This function is to check and allow documents for uploading is pdf with the size of 256kb 
+	 */
+	
 	public boolean isFileSizeLessThan256KB(String fileUrl) {
 		try {
 			URL url = new URL(fileUrl);

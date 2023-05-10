@@ -75,7 +75,7 @@ public class ReimbursementRequestsDTO {
 	private Integer requestProcessedByEmployeeId;
 
 	@NotBlank(message = "Status cannot be null/empty")
-	@Pattern(regexp = "^(New|Rejected|Approved)$", message = "Invalid Status. Status should exactly be New | Approved | Rejected")
+	@Pattern(regexp = "New|Rejected|Approved", message = "Invalid Status. Status should exactly be New | Approved | Rejected")
 	private String status;
 
 	private String remarks;

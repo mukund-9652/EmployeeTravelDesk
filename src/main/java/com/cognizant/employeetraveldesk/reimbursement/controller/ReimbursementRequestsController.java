@@ -54,7 +54,7 @@ public class ReimbursementRequestsController {
 
 	@PutMapping("/{reimbursementid}/process")
 	public ResponseEntity<Void> putReimbursement(@PathVariable Integer reimbursementid,
-			@RequestBody ReimbursementRequestsDTO request) {
+			@Valid @RequestBody  ReimbursementRequestsDTO request) {
 		// This
 		// This returns the status code if the reimbursement request is updated or not
 
