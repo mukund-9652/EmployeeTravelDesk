@@ -1,6 +1,8 @@
 package com.cognizant.employeetraveldesk.reimbursement.service.implementation;
 
 import java.math.BigDecimal;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 
 	@Override
 	public boolean createRequest(ReimbursementRequestsDTO requestDTO)
-			throws DuplicateResourceException, ResourceNotFoundException, InvalidResourceException {
+			throws DuplicateResourceException, InvalidResourceException {
 		// TODO Auto-generated method stub
 
 		Optional<ReimbursementRequests> result;
@@ -40,18 +42,21 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 			throw new DuplicateResourceException(
 					"Resource is already available for Id : " + reimbursementRequests.getId());
 		}
-		
-		if(this.checkTravelPlannerDate(reimbursementRequests.getInvoiceDate())==false) {
-			throw new InvalidResourceException("Invalid Invoice Date: "+reimbursementRequests.getInvoiceDate());
+
+			if (!this.isFileSizeLessThan256KB(reimbursementRequests.getDocumentURL())) {
+				throw new InvalidResourceException("Invalid Document Size! It must be less than 256 kb");
+			}
+
+		if (!this.checkTravelPlannerDate(reimbursementRequests.getInvoiceDate())) {
+			throw new InvalidResourceException("Invalid Invoice Date: " + reimbursementRequests.getInvoiceDate());
 		}
-		if(this.checkInvoiceAmount(reimbursementRequests)) {
-			//throw new InvalidResourceException("Invalid Invoice Amount");
+
+		if (this.checkInvoiceAmount(reimbursementRequests)) {
 			reimbursementRequestsRepository.save(reimbursementRequests);
 			return true;
 		}
-		
-		return false;
 
+		return false;
 	}
 
 	@Override
@@ -76,7 +81,7 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 	}
 
 	@Override
-	public ReimbursementRequestsDTO readRequest(int id) throws ResourceNotFoundException {
+	public ReimbursementRequestsDTO readRequestByReimbursementId(int id) throws ResourceNotFoundException {
 		// TODO Auto-generated method stub
 		ReimbursementRequests resultEntity;
 		ReimbursementRequestsDTO resultDTO;
@@ -106,6 +111,8 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 				System.out.println("currentstatus equals updatedstatus");
 				return false;
 			}
+			LocalDate updatedDate=LocalDate.now();
+			request.setRequestProcessedOn(updatedDate);
 			reimbursementRequestsRepository.save(request);
 			return true;
 		} else {
@@ -122,36 +129,58 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 		}
 		return true;
 	}
-	
+
 	public boolean checkInvoiceAmount(ReimbursementRequests request) throws InvalidResourceException {
-		
-		
-		System.out.println("-------------------"+request.getReimbursementTypes().getType()+"----------------------");
-		
-		List<Object[]> invoicePerDayDetails = reimbursementRequestsRepository.getReimbursementRequestsByEmployeeIdAndType(request.getRequestRaisedByEmployeeId(),request.getReimbursementTypes().getType());
-		
-		System.out.println("Result:\n"+invoicePerDayDetails.size());
-		
-		for (Object[] result: invoicePerDayDetails) {
-			java.sql.Date sqlDate = (Date) result[1];
-			LocalDate invoiceDate = sqlDate.toLocalDate();
-            BigDecimal value=new BigDecimal(result[2].toString());
-            Double invoiceAmount=value.doubleValue();
-            String type=(String) result[3];
-            
-            System.out.println(invoiceDate+" "+" "+invoiceAmount+" "+type);
-            
-            if((type.equalsIgnoreCase("Food") || type.equalsIgnoreCase("Water")) && invoiceAmount+request.getInvoiceAmount()>1500) {
-            	throw new InvalidResourceException("Invalid amount for Food/Water. Your food limit per day is 1500. Your current invoice amount for food is Rs."+invoiceAmount+" for the date "+invoiceDate);
-            }
-            else if(type.equalsIgnoreCase("Laundry") && invoiceAmount+request.getInvoiceAmount()>500) {
-            	throw new InvalidResourceException("Invalid amount for Laundry. Your food limit per day is 500. Your current invoice amount for Laundry is Rs."+invoiceAmount+" for the date "+invoiceDate);
-            }
-            else if( type.equalsIgnoreCase("Local Travel") && invoiceAmount+request.getInvoiceAmount()>1000) {
-            	throw new InvalidResourceException("Invalid amount for Local Travel. Your Local Travel limit per day is 1000. Your current invoice amount for Local Travel is Rs."+invoiceAmount+" for the date "+invoiceDate);
-            }
-        }
-		return true;
+
+		try {
+			List<Object[]> invoicePerDayDetails = reimbursementRequestsRepository
+					.getReimbursementRequestsByEmployeeIdAndType(request.getRequestRaisedByEmployeeId(),
+							request.getReimbursementTypes().getType());
+
+			for (Object[] result : invoicePerDayDetails) {
+				java.sql.Date sqlDate = (Date) result[1];
+				LocalDate invoiceDate = sqlDate.toLocalDate();
+				BigDecimal value = new BigDecimal(result[2].toString());
+				Double invoiceAmount = value.doubleValue();
+				String type = (String) result[3];
+
+				if ((type.equalsIgnoreCase("Food") || type.equalsIgnoreCase("Water"))
+						&& invoiceAmount + request.getInvoiceAmount() > 1500
+						&& invoiceDate.isEqual(request.getInvoiceDate())) {
+					throw new InvalidResourceException(
+							"Invalid amount for Food/Water. Your food limit per day is 1500. Your current invoice amount for food/water is Rs."
+									+ invoiceAmount + " for the date " + invoiceDate);
+				} else if (type.equalsIgnoreCase("Laundry") && invoiceAmount + request.getInvoiceAmount() > 500
+						&& invoiceDate.isEqual(request.getInvoiceDate())) {
+					throw new InvalidResourceException(
+							"Invalid amount for Laundry. Your food limit per day is 500. Your current invoice amount for Laundry is Rs."
+									+ invoiceAmount + " for the date " + invoiceDate);
+				} else if (type.equalsIgnoreCase("Local Travel") && invoiceAmount + request.getInvoiceAmount() > 1000
+						&& invoiceDate.isEqual(request.getInvoiceDate())) {
+					throw new InvalidResourceException(
+							"Invalid amount for Local Travel. Your Local Travel limit per day is 1000. Your current invoice amount for Local Travel is Rs."
+									+ invoiceAmount + " for the date " + invoiceDate);
+				}
+			}
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public boolean isFileSizeLessThan256KB(String fileUrl) {
+		try {
+			URL url = new URL(fileUrl);
+			URLConnection conn = url.openConnection();
+			conn.connect();
+			long fileSizeInBytes = conn.getContentLength();
+			long fileSizeInKB = fileSizeInBytes / 1024;
+			return fileSizeInKB <= 256;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 }

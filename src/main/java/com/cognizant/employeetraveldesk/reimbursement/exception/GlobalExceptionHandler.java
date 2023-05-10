@@ -23,12 +23,13 @@ public class GlobalExceptionHandler {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
 		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
 	}
-	
-	//handle constraints exception
+
+	// handle constraints exception
 	@ExceptionHandler(ConstraintViolationException.class)
-	public ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException exception, WebRequest request) {
+	public ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException exception,
+			WebRequest request) {
 		return null;
-		
+
 	}
 
 	// handle Resource not found exception
@@ -53,19 +54,26 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	//handle Invalid Resource Exception
+	// handle Invalid Resource Exception
 	@ExceptionHandler(InvalidResourceException.class)
-	public ResponseEntity<?> handleInvalidResourceException(InvalidResourceException exception,
-			WebRequest request) {
+	public ResponseEntity<?> handleInvalidResourceException(InvalidResourceException exception, WebRequest request) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), "Invalid Resource Error", exception.getMessage());
 		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_ACCEPTABLE);
 	}
-	
+
 	// handle Validation Exceptions
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<?> customValidationException(MethodArgumentNotValidException exception) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), "Validation Error",
 				exception.getBindingResult().getFieldError().getDefaultMessage());
+		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+	}
+
+	// handle Null Pointer Exceptions
+	@ExceptionHandler(NullPointerException.class)
+	public ResponseEntity<?> customNullPointerException(NullPointerException exception, WebRequest request) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
+
 		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
 	}
 
@@ -76,13 +84,14 @@ public class GlobalExceptionHandler {
 		String errorMessage = rootCause.getMessage();
 		return new ResponseEntity<>("Error: " + errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
+
 	// To handle wrong API Calls
 
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 	public ResponseEntity<?> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException exception) {
-		
-		ErrorDetails errorDetails=new ErrorDetails(new Date(),"Invalid request method.", "Supported methods are: " + exception.getSupportedHttpMethods());
-		return  new ResponseEntity<>(errorDetails,HttpStatus.METHOD_NOT_ALLOWED);
+
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), "Invalid request method.",
+				"Supported methods are: " + exception.getSupportedHttpMethods());
+		return new ResponseEntity<>(errorDetails, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 }

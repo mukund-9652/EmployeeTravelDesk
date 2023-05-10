@@ -1,5 +1,6 @@
 package com.cognizant.employeetraveldesk.reimbursement.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -49,16 +50,18 @@ class ReimbursementRequestsControllerTest {
 			new ReimbursementTypes(3, null), "1925678", LocalDate.of(2023, 1, 22), 1050, "www.outlook.com", null, null,
 			"New", "");
 
-	private List<ReimbursementRequestsDTO> requests = new ArrayList<ReimbursementRequestsDTO>(Arrays.asList(requestDTO_1,requestDTO_2,requestDTO_3));
+	private List<ReimbursementRequestsDTO> requestsDTO = new ArrayList<ReimbursementRequestsDTO>(Arrays.asList(requestDTO_1,requestDTO_2,requestDTO_3));
 
 	@Test
 	public void getRequestsForTravelRequestIdSuccess() throws Exception {
 			int travelRequestId = requestDTO_1.getTravelRequestId();
 			
-			when(reimbursementRequestsServicesImpl.readAllRequestsForTravelRequestId(travelRequestId)).thenReturn(requests);
+			when(reimbursementRequestsServicesImpl.readAllRequestsForTravelRequestId(travelRequestId)).thenReturn(requestsDTO);
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
 					.get("http://localhost:8084/api/reimbursements/"+travelRequestId+"/requests")
 					.accept(MediaType.APPLICATION_JSON)).andReturn();
 			System.out.println(mvcResult.getResponse().getContentAsString()); 
+			
+			//assertEquals(requestsDTO.toString(),mvcResult.getResponse().getContentAsString());
 	}
 }

@@ -35,12 +35,14 @@ class ReimbursementTypesServiceImplTest {
 		MockitoAnnotations.openMocks(this);
 	}
 
+	/*
+	 * This test is to check the output from the service layer of Reimbursement
+	 * Types
+	 */
+	
 	@Test
 	public void retrieveListOfTypesTest() {
-
-		// This test is to check the output from the service layer of Reimbursement
-		// Types
-
+		
 		List<ReimbursementTypes> expectedTypes = new ArrayList<>(
 				Arrays.asList(new ReimbursementTypes(1, "Food"), new ReimbursementTypes(2, "Water"),
 						new ReimbursementTypes(3, "Laundry"), new ReimbursementTypes(4, "Local Travel")));

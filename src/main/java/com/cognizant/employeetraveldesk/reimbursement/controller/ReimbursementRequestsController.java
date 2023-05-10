@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.employeetraveldesk.reimbursement.exception.DuplicateResourceException;
 import com.cognizant.employeetraveldesk.reimbursement.exception.InvalidResourceException;
-import com.cognizant.employeetraveldesk.reimbursement.exception.ResourceNotFoundException;
 import com.cognizant.employeetraveldesk.reimbursement.model.ReimbursementRequestsDTO;
 import com.cognizant.employeetraveldesk.reimbursement.service.implementation.ReimbursementRequestsServiceImpl;
 
@@ -39,11 +38,11 @@ public class ReimbursementRequestsController {
 	@GetMapping("/{reimbursementid}")
 	public ReimbursementRequestsDTO getReimbursement(@PathVariable Integer reimbursementid) {
 		// This Returns the reimbursement request DTO for the given reimbursement id
-		return reimbursementRequestsServiceImpl.readRequest(reimbursementid);
+		return reimbursementRequestsServiceImpl.readRequestByReimbursementId(reimbursementid);
 	}
 
 	@PostMapping("/add")
-	public ResponseEntity<Void> createReimbursement(@Valid @RequestBody ReimbursementRequestsDTO request) throws DuplicateResourceException, ResourceNotFoundException, InvalidResourceException {
+	public ResponseEntity<Void> createReimbursement(@Valid @RequestBody ReimbursementRequestsDTO request) throws DuplicateResourceException, InvalidResourceException {
 		// This returns the status code if the reimbursement request is created or not
 		boolean requestStatusCheck = reimbursementRequestsServiceImpl.createRequest(request);
 		if (requestStatusCheck) {

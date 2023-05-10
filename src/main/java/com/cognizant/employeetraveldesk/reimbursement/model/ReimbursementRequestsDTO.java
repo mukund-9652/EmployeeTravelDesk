@@ -62,7 +62,7 @@ public class ReimbursementRequestsDTO {
 	@PastOrPresent(message = "Invoice Date cannot be a future date or should not be null")
 	private LocalDate invoiceDate;
 
-	@Min(value = 100, message = "Invoice Amount must be at least 100")
+	@Min(value = 10, message = "Invoice Amount must be at least Rs.10")
 	private int invoiceAmount;
 
 	@NotBlank(message = "Document URL Should not be null/empty")
