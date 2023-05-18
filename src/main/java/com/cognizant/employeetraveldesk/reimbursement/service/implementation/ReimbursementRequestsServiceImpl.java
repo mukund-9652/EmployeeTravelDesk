@@ -43,9 +43,9 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 					"Resource is already available for Id : " + reimbursementRequests.getId());
 		}
 
-			if (!this.isFileSizeLessThan256KB(reimbursementRequests.getDocumentURL())) {
-				throw new InvalidResourceException("Invalid Document Size! It must be less than 256 kb");
-			}
+		if (!this.isFileSizeLessThan256KB(reimbursementRequests.getDocumentURL())) {
+			throw new InvalidResourceException("Invalid Document Size! It must be less than 256 kb");
+		}
 
 		if (!this.checkTravelPlannerDate(reimbursementRequests.getInvoiceDate())) {
 			throw new InvalidResourceException("Invalid Invoice Date: " + reimbursementRequests.getInvoiceDate());
@@ -99,7 +99,8 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 	}
 
 	@Override
-	public boolean updateRequest(ReimbursementRequestsDTO requestDTO) throws ResourceNotFoundException,InvalidResourceException {
+	public boolean updateRequest(ReimbursementRequestsDTO requestDTO)
+			throws ResourceNotFoundException, InvalidResourceException {
 		// TODO Auto-generated method stub
 
 		ReimbursementRequests request = entityDTOMapper.mapDTOToEntity(requestDTO);
@@ -109,12 +110,12 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 			String updatedStatus = request.getStatus(), currentStatus = result.get().getStatus();
 			if (currentStatus.equalsIgnoreCase(updatedStatus)) {
 				throw new InvalidResourceException("You should only update the status and not any other values.");
-			} 
-			
-			if(request.getStatus().equalsIgnoreCase("Rejected") && request.getRemarks().isEmpty()) {
+			}
+
+			if (request.getStatus().equalsIgnoreCase("Rejected") && request.getRemarks().isEmpty()) {
 				throw new InvalidResourceException("Remaks cannot be Empty when the request is rejected.");
 			}
-			LocalDate updatedDate=LocalDate.now();
+			LocalDate updatedDate = LocalDate.now();
 			request.setRequestProcessedOn(updatedDate);
 			reimbursementRequestsRepository.save(request);
 			return true;
@@ -124,9 +125,10 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 	}
 
 	/*
-	 * This function is to check invoice date is with in the from and to date of the travel
+	 * This function is to check invoice date is with in the from and to date of the
+	 * travel
 	 */
-	
+
 	public boolean checkTravelPlannerDate(LocalDate inputDate) {
 		LocalDate startDate = LocalDate.of(2023, 01, 01);
 		LocalDate endDate = LocalDate.of(2024, 01, 01);
@@ -136,12 +138,11 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 		}
 		return true;
 	}
-	
+
 	/*
-	 * This function is to check and allow expense per day for food, laundry and local travel is as follows 
-	 * Food and water – upto 1500 per day 
-	 * Laundry – upto 500 per day
-	 * Local travel – upto 1000 per day 
+	 * This function is to check and allow expense per day for food, laundry and
+	 * local travel is as follows Food and water – upto 1500 per day Laundry – upto
+	 * 500 per day Local travel – upto 1000 per day
 	 */
 
 	public boolean checkInvoiceAmount(ReimbursementRequests request) throws InvalidResourceException {
@@ -184,19 +185,22 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 	}
 
 	/*
-	 * This function is to check and allow documents for uploading is pdf with the size of 256kb 
+	 * This function is to check and allow documents for uploading is pdf with the
+	 * size of 256kb
 	 */
-	
-	public boolean isFileSizeLessThan256KB(String fileUrl) {
+
+	public boolean isFileSizeLessThan256KB(String fileUrl) throws InvalidResourceException {
 		try {
 			URL url = new URL(fileUrl);
+			if (!fileUrl.contains(".pdf")) {
+				throw new InvalidResourceException("Need to pass a PDF File");
+			}
 			URLConnection conn = url.openConnection();
 			conn.connect();
 			long fileSizeInBytes = conn.getContentLength();
 			long fileSizeInKB = fileSizeInBytes / 1024;
 			return fileSizeInKB <= 256;
 		} catch (Exception e) {
-			e.printStackTrace();
 			return false;
 		}
 	}

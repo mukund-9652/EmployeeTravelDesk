@@ -282,5 +282,22 @@ class ReimbursementRequestsServiceImplTest {
 		assertThrows(InvalidResourceException.class,
 				() -> reimbursementRequestsServiceImpl.createRequest(reimbursementRequestDTO));
 	}
+	
+	/*
+	 * TEST - 5 : Testing the createRequest method for ReimbursementRequestService -
+	 * Fail due to Invalid Resource : Invalid Document URL
+	 */
+
+	@Test
+	public void createRequestTestFail_ValidationException_URL() throws InvalidResourceException {
+		ReimbursementRequestsDTO reimbursementRequestDTO = new ReimbursementRequestsDTO(100, 1234567, 9876543,
+				currentDate, new ReimbursementTypes(1, "Food"), "1928374", LocalDate.of(2023, 1, 21), 1200,
+				"www.google.com", null, null, "Reject", "");
+
+		when(reimbursementRequestsRepository.save(any())).thenThrow(InvalidResourceException.class);
+		assertThrows(InvalidResourceException.class,
+				() -> reimbursementRequestsServiceImpl.createRequest(reimbursementRequestDTO));
+	}
+
 
 }

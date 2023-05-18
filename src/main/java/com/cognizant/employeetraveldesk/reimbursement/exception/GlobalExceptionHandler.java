@@ -1,5 +1,6 @@
 package com.cognizant.employeetraveldesk.reimbursement.exception;
 
+import java.net.MalformedURLException;
 import java.util.Date;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -94,4 +95,15 @@ public class GlobalExceptionHandler {
 				"Supported methods are: " + exception.getSupportedHttpMethods());
 		return new ResponseEntity<>(errorDetails, HttpStatus.METHOD_NOT_ALLOWED);
 	}
+	
+	// MalformedURLException
+	
+	@ExceptionHandler(MalformedURLException.class)
+	public ResponseEntity<?> handleMalformedURLException(MalformedURLException exception) {
+
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), "Invalid request method.",
+				"Invalid Document URL " + exception.getMessage());
+		return new ResponseEntity<>(errorDetails, HttpStatus.METHOD_NOT_ALLOWED);
+	}
+	
 }
