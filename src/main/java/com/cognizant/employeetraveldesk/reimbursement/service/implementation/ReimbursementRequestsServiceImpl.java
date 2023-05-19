@@ -42,8 +42,13 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 			throw new DuplicateResourceException(
 					"Resource is already available for Id : " + reimbursementRequests.getId());
 		}
-
-		if (!this.isFileSizeLessThan256KB(reimbursementRequests.getDocumentURL())) {
+		
+		String fileUrl=reimbursementRequests.getDocumentURL();
+		if (!fileUrl.contains(".pdf")) {
+			throw new InvalidResourceException("Need to pass a PDF File");
+		}
+		
+		if (!this.isFileSizeLessThan256KB(fileUrl)) {
 			throw new InvalidResourceException("Invalid Document Size! It must be less than 256 kb");
 		}
 
@@ -191,10 +196,8 @@ public class ReimbursementRequestsServiceImpl implements ReimbursementRequestsSe
 
 	public boolean isFileSizeLessThan256KB(String fileUrl) throws InvalidResourceException {
 		try {
+			
 			URL url = new URL(fileUrl);
-			if (!fileUrl.contains(".pdf")) {
-				throw new InvalidResourceException("Need to pass a PDF File");
-			}
 			URLConnection conn = url.openConnection();
 			conn.connect();
 			long fileSizeInBytes = conn.getContentLength();
