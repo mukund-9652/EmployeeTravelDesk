@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,7 @@ import com.cognizant.employeetraveldesk.reimbursement.service.implementation.Rei
 @Validated
 @RestController
 @RequestMapping("/api/reimbursements")
+@CrossOrigin(origins ="http://localhost:4200")
 public class ReimbursementRequestsController {
 		
 	@Autowired
@@ -40,6 +42,12 @@ public class ReimbursementRequestsController {
 	public ReimbursementRequestsDTO getReimbursement(@PathVariable Integer reimbursementid) {
 		// This Returns the reimbursement request DTO for the given reimbursement id
 		return reimbursementRequestsServiceImpl.readRequestByReimbursementId(reimbursementid);
+	}
+	
+	@GetMapping("/id:{employeeid}")
+	public List<ReimbursementRequestsDTO> getReimbursementRequestsByEmployeeId(@PathVariable Integer employeeid) {
+		// This Returns the reimbursement request DTO for the given reimbursement id
+		return reimbursementRequestsServiceImpl.readRequestByEmployeeId(employeeid);
 	}
 
 	@PostMapping("/add")
